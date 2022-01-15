@@ -6,7 +6,7 @@ provides directory operation cmd commands
 import click
 
 # local-lib
-from . import dir_ops
+from src.cli_commands import dir_ops
 
 
 @click.command(name='copy_files_to_dir')
