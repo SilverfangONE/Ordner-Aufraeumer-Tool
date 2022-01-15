@@ -10,6 +10,29 @@ import shutil
 import click
 
 
+def search(path: str, filename: str = None, filetype: str = None):
+    """
+    search after files in a dir, default: search after all files in dir
+
+    :param path: path to dir in which the search should begin
+    :param filename: filename from target file
+    :param filetype: filetype from target file/s
+    """
+    filter_fun_list = []
+
+    if filename is not None:
+        def f(tar_filename: str):
+            return True if tar_filename == filename else False
+        filter_fun_list.append(f)
+
+    if filetype is not None:
+        def f(tar_filetype: str):
+            return True if tar_filetype == filetype else False
+        filter_fun_list.append(f)
+
+    return _iter_dir(path=path, filter_funs=filter_fun_list)
+
+
 # search after one specific filename
 def search_file_with_specific_name(path, filename=None):
     """
@@ -44,7 +67,7 @@ def search_files_with_specific_type():
 
 
 # iterate through the given source dir
-def _iter_dir(path: str, filter_fun):
+def _iter_dir(path: str, filter_fun_list:
     """
     iterate through the given source dir
 
