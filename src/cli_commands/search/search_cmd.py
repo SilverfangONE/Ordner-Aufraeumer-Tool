@@ -27,5 +27,12 @@ def search(path: str, filename: str = None, filetype: str = None):
     return
 
 
+@click.group()
+def search_cli():
+    pass
+
+
+search_cli.add_command(search)
+
 if __name__ == "__main__":
-    search()
+    search_cli()
