@@ -5,8 +5,6 @@ provides dir/files search operation functions
 # std lib
 import os
 
-import click
-
 
 def create_filter(filter_fun_list):
     def f(file):
