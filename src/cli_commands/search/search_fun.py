@@ -4,10 +4,18 @@ provides dir/files search operation functions
 
 # std lib
 import os
-import shutil
 
-# third party-lib
 import click
+
+
+def create_filter(filter_fun_list):
+    def f(file):
+        for fil in filter_fun_list:
+            if not fil(file):
+                return False
+        return True
+
+    return f
 
 
 def search(path: str, filename: str = None, filetype: str = None):
@@ -18,19 +26,35 @@ def search(path: str, filename: str = None, filetype: str = None):
     :param filename: filename from target file
     :param filetype: filetype from target file/s
     """
+
     filter_fun_list = []
 
+    # options
     if filename is not None:
-        def f(tar_filename: str):
-            return True if tar_filename == filename else False
+        def f(filepath: str):
+            # check if the filename is correct
+            return True if os.path.splitext(filepath)[0] == filename or filepath == filename else False
+
         filter_fun_list.append(f)
 
     if filetype is not None:
-        def f(tar_filetype: str):
-            return True if tar_filetype == filetype else False
+        def f(filepath: str):
+            # check if the filetype is correct
+            return True if os.path.splitext(filepath)[1].replace('.', '') == filetype.replace('.', '') else False
+
         filter_fun_list.append(f)
 
-    return _iter_dir(path=path, filter_funs=filter_fun_list)
+    del f
+
+    # filter execute default option
+    def default_filter(file):
+        return True
+
+    return _iter_dir(
+        path=path,
+        # determine between default execution and advanced
+        filter_fun=create_filter(filter_fun_list) if len(filter_fun_list) > 0 else default_filter
+    )
 
 
 # search after one specific filename
@@ -50,24 +74,8 @@ def search_file_with_specific_name(path, filename=None):
     return None
 
 
-# search for all files in a dir
-def search_files_in_dir(path: str):
-    filepath_list = []
-
-    def add_to_list(file):
-        filepath_list.append(os.path.abspath(file))
-
-    _iter_dir(path=path, filter_fun=add_to_list)
-    return filepath_list
-
-
-# search files in dir with a filter fun.
-def search_files_with_specific_type():
-    return
-
-
 # iterate through the given source dir
-def _iter_dir(path: str, filter_fun_list:
+def _iter_dir(path: str, filter_fun):
     """
     iterate through the given source dir
 
@@ -76,8 +84,11 @@ def _iter_dir(path: str, filter_fun_list:
     :param filter_fun: filter function for further operations
     """
 
+    files_paths_list = []
+
     for root, dirs, files in os.walk(path):
         for f in files:
-            filter_fun(f)
-    return
-
+            # iter through filters
+            if filter_fun(f):
+                files_paths_list.append(os.path.abspath(f))
+    return files_paths_list
