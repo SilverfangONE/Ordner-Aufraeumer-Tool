@@ -17,7 +17,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'dir-cli = src.Main:main',
+            'dir = src.cli_commands:exe',
         ]
     }
 )

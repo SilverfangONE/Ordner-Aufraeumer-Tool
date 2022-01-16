@@ -1,17 +1,28 @@
 """
-provides cmd-commands for directory and arithmetic operations
+provides full cmd application for files searching, coping, shifting, deleting
 """
 
-# std-lib
+# third-party-lib
 import click
 
 # local-lib
-from .dir_sort import cli as dir_cli
+from .search import search_cmd
+from .copy import copy_cmd
+from .delete import delete_cmd
+from .shift import shift_cmd
 
-# add cli groups to one cli group
-cli = click.CommandCollection(sources=[dir_cli])
+cli = click.CommandCollection(
+    sources=[
+        search_cmd,
+        copy_cmd,
+        delete_cmd,
+        shift_cmd]
+)
 
 
-def lunch():
-    """ starts CMD-Commands """
+def exe():
+    cli()
+
+
+if __name__ == '__main__':
     cli()
